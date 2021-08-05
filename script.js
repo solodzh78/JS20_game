@@ -29,7 +29,9 @@
 
 // ==================================== функции =============================================
 const isNumber = function (n) {
-        return !isNaN(parseFloat(n)) && isFinite(n);
+    let tempVar = !isNaN(parseFloat(n)) && isFinite(n);
+    if (!tempVar) {alert('Введи целое число от 1 до 100!');}
+        return tempVar;
     };
 
 // Генерирует случайное целое число от min до max
@@ -52,17 +54,16 @@ const getNumber = function (title, defaultValue = '') {
                 && +tempVariable === Math.floor(+tempVariable)
             )
         );
-        console.log('tempVariable: ', tempVariable);
         return +tempVariable;
     };
     
 // ============================== организация замыкания =====================================
 function createGame () {
     // генерирование числа от 1 до 100
-    const n = 50;//getRandomInteger(1, 100);
+    const n = getRandomInteger(1, 100);
     // счетчик попыток
     let count = 10;
-
+// возвращает объект с ключами result и count
     return function (num) {
         let result;
         count--;
@@ -81,37 +82,40 @@ function createGame () {
 }
 // ============================== объявление переменных =====================================
 
-let num;
-let answer;
-let startNewGame = true;
-let startNextGame = true;
-
-// ==================================== Тело игры ===========================================
-const getStartNewGame = function (start) {
+// ==================================== Старт игры ===========================================
+function getStartNewGame (start) {
 
     if (!start) {return;}
+        
     const game = createGame();
-    num = getNumber('Угадай целое число от 1 до 100');
+    let num = getNumber('Угадай целое число от 1 до 100');
+// ==================================== Тело игры ===========================================
+    function gameBody(callback) {
+        console.log('Вызов функции game');
+        let answer = callback(num);
 
-    answer = game(num);
+        if (answer.count < 1) {
+            let startNewGame = confirm('Попытки закончились, хотите сыграть еще?');
+            if (!startNewGame) {alert('До свидания!');}
+            getStartNewGame(startNewGame);
 
-    if (answer.count < 1) {
-        startNewGame = confirm('Попытки закончились, хотите сыграть еще?');
-        getStartNewGame(startNewGame);
+        } else if (answer.result === 'big') {
+            num = getNumber('Загаданное число меньше, осталось попыток: ' + answer.count);
+            gameBody(callback);
+
+        } else if (answer.result === 'small') {
+            num = getNumber('Загаданное число больше, осталось попыток: ' + answer.count);
+            gameBody(callback);
+
+        } else if (answer.result === 'bingo') {
+            let startNewGame = confirm('Поздравляю, Вы угадали!!! Хотели бы сыграть еще?');
+            if (!startNewGame) {alert('До свидания!');}
+            getStartNewGame(startNewGame);
+        }
     }
 
-    if (answer.result === 'big') {
-        num = getNumber('Загаданное число меньше, осталось попыток: ' + answer.count);
-        getStartNewGame(startNewGame);
-
-    } else if (answer.result === 'small') {
-        num = getNumber('Загаданное число больше, осталось попыток: ' + answer.count);
-        getStartNewGame(startNewGame);
-
-    } else if (answer.result === 'bingo') {
-        startNextGame = confirm('Поздравляю, Вы угадали!!! Хотели бы сыграть еще?');
-        getStartNewGame(startNewGame);
-    }
-};
+    gameBody(game);
+}
 
 getStartNewGame(true);
+console.log('Игра окончена');
