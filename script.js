@@ -29,7 +29,11 @@
 
 // ==================================== функции =============================================
 const isNumber = function (n) {
-    let tempVar = !isNaN(parseFloat(n)) && isFinite(n);
+    let tempVar =   !isNaN(parseFloat(n)) 
+                    && isFinite(n)
+                    && +n >= 1 
+                    && +n <= 100 
+                    && +n === Math.floor(+n);
     if (!tempVar) {alert('Введи целое число от 1 до 100!');}
         return tempVar;
     };
@@ -44,16 +48,9 @@ const getRandomInteger = function (min, max) {
 // Принимает только целое число от 1 до 100 и отдает в виде Number
 const getNumber = function (title, defaultValue = '') {
         let tempVariable;
-        
         do {
             tempVariable = prompt(title, defaultValue);
-        } while (
-            !(  isNumber(tempVariable) 
-                && +tempVariable >= 1 
-                && +tempVariable <= 100 
-                && +tempVariable === Math.floor(+tempVariable)
-            )
-        );
+        } while (!isNumber(tempVariable));
         return +tempVariable;
     };
     
@@ -74,7 +71,6 @@ function createGame () {
         } else {
             result = 'small';
         }
-        console.log(count, n);
         return {
             'result': result,
             'count': count,};
@@ -91,7 +87,6 @@ function getStartNewGame (start) {
     let num = getNumber('Угадай целое число от 1 до 100');
 // ==================================== Тело игры ===========================================
     function gameBody(callback) {
-        console.log('Вызов функции game');
         let answer = callback(num);
 
         if (answer.count < 1) {
